@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "allowJs": true,
+    "baseUrl": "src",
+    "outDir": "dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "target": "es2016",
+    "module": "ESNext",
+    "moduleResolution": "NodeNext",
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "declaration": true,
+    "declarationMap": true,
+    "paths": {
+      "./*": ["./*"]
+    },
+    "skipLibCheck": true,
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "typeRoots": [
+      "src"
+    ]
+  },
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}
