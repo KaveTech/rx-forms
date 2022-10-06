@@ -1,5 +1,5 @@
 {
-  "name": "rx-forms",
+  "name": "@kavetech/forms",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
