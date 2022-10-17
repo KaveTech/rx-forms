@@ -1,15 +1,27 @@
 {
-  "name": "@kavetech/forms",
+  "name": "@kavehome/forms",
   "version": "1.0.0",
-  "description": "",
+  "description": "Reactive Forms for your application",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc"
   },
   "author": "Shad0wflame",
   "license": "ISC",
   "devDependencies": {
     "typescript": "^4.8.4"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KaveTech/rx-forms.git"
+  },
+  "keywords": [
+    "forms",
+    "kavehome"
+  ],
+  "bugs": {
+    "url": "https://github.com/KaveTech/rx-forms/issues"
+  },
+  "homepage": "https://github.com/KaveTech/rx-forms#readme"
 }
