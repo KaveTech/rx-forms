@@ -180,7 +180,7 @@ const withControls = <T = any>(controls: ControlMap<T, keyof T>): Mixin<WithCont
         addControl(controls) {
             _controls = new Map([
                 ..._controls,
-                ...parseControls<T>(assignParent(this, controls))
+                ...assignParent(this, parseControls<T>(controls))
             ]);
         },
         pipe(...functors) {
