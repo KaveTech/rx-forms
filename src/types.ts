@@ -53,6 +53,7 @@ export type WithValidation = {
 export type WithState = {
     updateState(value: any): void,
     pristine: boolean,
+    touched: boolean,
     setDirty(): void
 };
 
