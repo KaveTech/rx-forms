@@ -102,10 +102,17 @@ const withState = (
     )(obj);
 
     let _pristine: boolean = true;
+    let _touched: boolean = false;
 
     return mixin(base, {
         get pristine(): boolean {
             return _pristine;
+        },
+        get touched(): boolean {
+            return _touched;
+        },
+        set touched(value: boolean) {
+            _touched = value;
         },
         updateState(value: any) {
             if (!this.isDisabled()) {
