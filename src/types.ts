@@ -19,8 +19,19 @@ export type WithValueGetter<T = any> = (obj: any, value: T) => T;
 
 export type WithValueSetter<T = any> = (obj: any, value: T, current: T) => T;
 
-export type WithValueFn = <T = any>(props: {value: T, getter?: WithValueGetter<T>, setter?: WithValueSetter<T>}) =>
+export type WithValueFnProps<T = any> = {
+  value: T,
+  getter?: WithValueGetter<T>,
+  setter?: WithValueSetter<T>
+}
+export type WithValueFn = <T = any>(props: WithValueFnProps) =>
     Mixin<WithValue<T>>;
+
+export type WithStateFn = <T = any>(
+  validator: ValidatorFn,
+  predicate: (obj: any) => FormStatus,
+  valueProps: WithValueFnProps<T>,
+) => Mixin<WithState>
 
 export type ControlMap<T, K extends keyof T> = Map<T, RxFormControl<T[K]>>;
 
@@ -53,7 +64,9 @@ export type WithValidation = {
 export type WithState = {
     updateState(value: any): void,
     pristine: boolean,
+    // @deprecated - use setTouched
     touched: boolean,
+    setTouched: (value: boolean, propagate?: boolean) => void,
     setDirty(): void
 };
 
@@ -61,14 +74,14 @@ export type WithValue<T = any> = { value: T };
 
 export type WithParent = { parent: RxControlGroup | null };
 
+type FormFunctor<T> = ((controls: Array<[keyof T, RxFormControl<T[keyof T]>]>) => Array<[keyof T, RxFormControl<T[keyof T]>]>);
+
 export type WithControls<T> = {
     controls: Array<[keyof T, RxFormControl<T[keyof T]>]>;
     get<X extends unknown, K extends keyof T, RT extends ConditionalReturnType<X, T, K>>(key: ControlMapProp<T, K>): RT;
     get<RT>(key: ControlMapProp<T, keyof T>): RT;
     addControl(controls: FormModel<T> | FormArray<T>): void;
-    pipe(...functors: ((controls: Array<[keyof T, RxFormControl<T[keyof T]>]>) =>
-        Array<[keyof T, RxFormControl<T[keyof T]>]>
-    )[]);
+    pipe<RT = any>(...functors: FormFunctor<T>[]): RT;
 }
 
 /***

@@ -28,6 +28,10 @@ const createControl = <T = any>(value: T, validators?: ValidatorFn | ValidatorFn
             control.setDirty();
         }
 
+        if (!control.touched) {
+          control.setTouched(true, false);
+        }
+
         control.updateState(value);
 
         return value;
