@@ -17,6 +17,8 @@ yarn add @kavehome/forms
 
 ## Usage
 
+The `@kavehome/forms` library is an agnostic library, so it can be used with any framework or library, there have some examples of how to use it with `react`.
+
 This is a simple example of how to use a form in a react functional component:
 
 ```tsx
@@ -25,8 +27,8 @@ import { FormFactory } from '@kavehome/forms';
 import { RxControlGroup } from '@kavehome/forms/dist/types';
 
 interface FormValues {
-    name: string;
-    email: string;
+  name: string;
+  email: string;
 }
 
 const FormExample = () => {
@@ -36,8 +38,8 @@ const FormExample = () => {
   useEffect(() => {
     // Create the form
     form.current = FormFactory.group<FormValues>({
-        name: FormFactory.control(''),
-        email: FormFactory.control(''),
+      name: FormFactory.control(''),
+      email: FormFactory.control(''),
     })
 
     // Set the form model
@@ -68,6 +70,65 @@ const FormExample = () => {
       <input type="email" onChange={(e) => form.current!.get('email')!.value = e.target.value} />
       <button type="submit">Submit</button>
       <p>{JSON.stringify(formModel)}</p>
+  </form>)
+}
+```
+
+We can also use the `useForm` hook to create the form, and simplify the code.
+
+```tsx
+function useForm<T>(formGroup: RxControlGroup<T>): [
+  RxControlGroup<T> | null,
+  T | null,
+  (form: RxControlGroup<T> | undefined) => void
+] {
+  const [model, setModel] = useState<T | null>(null);
+  const formRef: MutableRefObject<RxControlGroup<T> | null> = useRef<RxControlGroup<T>>(null);
+
+  useLayoutEffect(() => {
+    if(!formGroup || formRef.current === formGroup) return;
+    formRef.current = formGroup;
+    setModel(formRef.current.value);
+  }, [formGroup]);
+
+  const onFormChange = (form: RxControlGroup<T> | undefined) => {
+    // add a debounce to avoid multiple renders
+    if(form) setModel(form.value);
+  }
+
+  return [ formRef.current, model, onFormChange ];
+}
+```
+
+So the previous example can be simplified to:
+
+```tsx
+import { useEffect, useRef, useState } from 'react';
+import { FormFactory } from '@kavehome/forms';
+import { RxControlGroup } from '@kavehome/forms/dist/types';
+import { useForm } from '.../useForm';
+
+interface FormValues {
+  name: string;
+  email: string;
+}
+
+function FormExample() {
+  const initForm = useMemo(() => FormFactory.group<FormValues>({
+    name: FormFactory.control(''),
+    email: FormFactory.control(''),
+  }), []);
+  const [form, model, onFormChange] = useForm<FormValues>(initForm);
+
+  if (!form) {
+    return null;
+  }
+
+  return (<form onChange={() => onFormChange(form)}>
+      <input type="text" onChange={(e) => form!.get('name')!.value = e.target.value} />
+      <input type="email" onChange={(e) => form!.get('email')!.value = e.target.value} />
+      <button type="submit">Submit</button>
+      <p>{JSON.stringify(model)}</p>
   </form>)
 }
 ```
