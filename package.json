@@ -1,6 +1,6 @@
 {
   "name": "@kavehome/forms",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Reactive Forms for your application",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
