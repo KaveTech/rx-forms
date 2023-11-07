@@ -161,14 +161,14 @@ const withState: WithStateFn = (
               this.updateState();
             }
         },
-        updateState() {
+        updateState(value: any) {
             if (!this.isDisabled()) {
-                this.validate(this.value);
+                this.validate(value);
                 this.updateStatus(predicate);
             }
 
             if (this.parent) {
-                (this.parent as WithState).updateState(this.value);
+                (this.parent as WithState).updateState(this.parent.value);
             }
         },
         setDirty() {
