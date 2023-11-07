@@ -157,8 +157,8 @@ const withState: WithStateFn = (
         setTouched(value: boolean, propagate: boolean = true) {
             _touched = value;
 
-            if (this.parent && propagate) {
-              this.updateState();
+            if (propagate) {
+              this.updateState(this.value);
             }
         },
         updateState(value: any) {
