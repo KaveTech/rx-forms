@@ -77,16 +77,23 @@ const withStatus: Mixin<WithStatus> = obj => {
  * ===== WithValidation =====
  */
 
-const withValidation: (validator: ValidatorFn) => Mixin<WithValidation> = (validator) => obj => mixin(obj, {
-    errors: null,
-    validate(value): void {
-        if (!validator) {
-            return;
-        }
+const withValidation: (validator: ValidatorFn) => Mixin<WithValidation> = (validator) => obj => {
+    let _validator: any = validator;
 
-        this.errors = validator(value)
-    }
-});
+    return mixin(obj, {
+        errors: null,
+        validate(value): void {
+            if (!_validator) {
+                return;
+            }
+
+            this.errors = _validator(value)
+        },
+        addValidator(...newValidator: ValidatorFn[]): void {
+            _validator = coerceToValidator([_validator, ...newValidator]);
+        }
+    });
+}
 
 /***
  * ===== WithValue =====
