@@ -59,6 +59,7 @@ export type WithStatus = {
 export type WithValidation = {
     errors: ValidationErrors | null,
     validate(value: any): void
+    addValidator(...newValidator: ValidatorFn[]): void
 };
 
 export type WithState = {
