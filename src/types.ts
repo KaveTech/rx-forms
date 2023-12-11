@@ -6,9 +6,9 @@ import {FormStatus} from "./mixins";
  * ========================
  */
 
-export type ValidatorFn = (value: any) => ValidationErrors | null;
+export type ValidatorFn = [string, (value: any) => string | null];
 
-export type ValidationErrors = Record<string, any>;
+export type ValidationErrors = string[];
 
 export type Mixin<Y> = <X extends object>(a: X) => X & Y;
 
@@ -28,7 +28,7 @@ export type WithValueFn = <T = any>(props: WithValueFnProps) =>
     Mixin<WithValue<T>>;
 
 export type WithStateFn = <T = any>(
-  validator: ValidatorFn,
+  validator: ValidatorFn | ValidatorFn[],
   predicate: (obj: any) => FormStatus,
   valueProps: WithValueFnProps<T>,
 ) => Mixin<WithState>
@@ -57,9 +57,10 @@ export type WithStatus = {
 };
 
 export type WithValidation = {
-    errors: ValidationErrors | null,
+    errors: ValidationErrors,
+    addValidator(...newValidator: ValidatorFn[]): void,
+    removeValidator(key: string): void,
     validate(value: any): void
-    addValidator(...newValidator: ValidatorFn[]): void
 };
 
 export type WithState = {
@@ -91,7 +92,7 @@ export type WithControls<T> = {
  * ========================
  */
 
-export type RxFormControl<T = any> = WithUUID & WithState & WithValidation & WithStatus & WithParent & WithValue<T> | null;
+export type RxFormControl<T = any> = WithUUID & WithState & WithValidation & WithStatus & WithParent & WithValue<T>;
 export type RxControlGroup<T = any> = WithControls<T> & RxFormControl;
 export type FormModel<T> = { [K in keyof T]?: RxFormControl<T[K]> };
 export type FormArray<T> =  T extends object ? RxControlGroup<T>[] : RxFormControl<T>[];
