@@ -19,7 +19,7 @@ import type {
     WithValueGetter,
     WithValueSetter
 } from "./types";
-import {coerceToValidator, lazyDeepCopy, mixin, parseControls, pipe} from "./utils";
+import {isValidatorFunction, lazyDeepCopy, mixin, parseControls, pipe} from "./utils";
 
 /***
  * ===== WithUUID =====
@@ -77,22 +77,44 @@ const withStatus: Mixin<WithStatus> = obj => {
  * ===== WithValidation =====
  */
 
-const withValidation: (validator: ValidatorFn) => Mixin<WithValidation> = (validator) => obj => {
-    let _validator: any = validator;
+const withValidation: (validators: ValidatorFn | ValidatorFn[]) => Mixin<WithValidation> = (validators = []) => obj => {
+  let _validators: ValidatorFn[] = isValidatorFunction(validators) ?
+      [validators as ValidatorFn] as ValidatorFn[] :
+      validators as ValidatorFn[];
 
-    return mixin(obj, {
-        errors: null,
-        validate(value): void {
-            if (!_validator) {
-                return;
-            }
+  const hasValidator = (validator: ValidatorFn): boolean => {
+    return _validators.some(v => v[0] === validator[0]);
+  }
 
-            this.errors = _validator(value)
-        },
-        addValidator(...newValidator: ValidatorFn[]): void {
-            _validator = coerceToValidator([_validator, ...newValidator]);
+  return mixin(obj, {
+      errors: [],
+      addValidator(...newValidator: ValidatorFn[]): void {
+        _validators = [
+          ..._validators,
+          ...newValidator.filter(v => !hasValidator(v))
+        ];
+      },
+      removeValidator(key: string): void {
+        const index = _validators.findIndex(v => v[0] === key);
+        if (index > -1) {
+          _validators.splice(index, 1);
         }
-    });
+      },
+      validate(value: any): void {
+        if (this.isDisabled()) {
+          return;
+        }
+
+        this.errors = _validators.reduce((res, [, validator]) => {
+          const error = validator(value);
+          if (error) {
+            res = [...res, error];
+          }
+
+          return res;
+        }, []);
+      }
+  });
 }
 
 /***
@@ -131,7 +153,7 @@ const withParent: Mixin<WithParent> = obj => mixin(obj, {
  */
 
 const withState: WithStateFn = (
-    validator: ValidatorFn,
+    validators: ValidatorFn | ValidatorFn[],
     predicate: (obj: any) => FormStatus,
     valueProps: WithValueFnProps
 ) => (obj) => {
@@ -143,7 +165,7 @@ const withState: WithStateFn = (
       & WithValue = pipe(
         withParent,
         withStatus,
-        withValidation(validator),
+        withValidation(validators),
         withValue(valueProps)
     )(obj);
 
@@ -162,16 +184,17 @@ const withState: WithStateFn = (
           _touched = value;
         },
         setTouched(value: boolean, propagate: boolean = true) {
+            const changed = value !== _touched;
             _touched = value;
 
-            if (propagate) {
+            if (propagate && changed) {
               this.updateState(this.value);
             }
         },
         updateState(value: any) {
             if (!this.isDisabled()) {
-                this.validate(value);
-                this.updateStatus(predicate);
+              this.validate(value);
+              this.updateStatus(predicate);
             }
 
             if (this.parent) {
@@ -247,7 +270,7 @@ export const createGenericControl = <T, CT>({
     let obj = pipe(
         withUUID,
         withState<T>(
-          coerceToValidator(validators), 
+          validators,
           calculateStatus,
           {value, getter, setter}
         )

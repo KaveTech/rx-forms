@@ -3,8 +3,6 @@ import {
     Mixin,
     Reduce,
     RxFormControl,
-    ValidationErrors,
-    ValidatorFn
 } from "./types";
 
 export const pipe = <T extends Mixin<unknown>[]>(...fns: T): <A extends object>(x: A) => Reduce<A, T> =>
@@ -30,31 +28,19 @@ export const mixin = <T>(target: any, ...sources: any[]): T => {
     return target as unknown as T;
 }
 
-const reduceValidators = (validators: ValidatorFn[]): ValidatorFn => (value: any) => {
-    let res = validators.reduce((errors: ValidationErrors, validator) => {
-        if (!validator) {
-            return null;
-        }
-
-        return {...errors, ...validator(value)};
-    }, {});
-
-    if (!Object.keys(res).length) {
-        res = null;
-    }
-
-    return res;
-}
-
-export const coerceToValidator = (validators: ValidatorFn | ValidatorFn[]): ValidatorFn | null  =>
-    Array.isArray(validators) ? reduceValidators(validators) : validators || null;
-
 export const isEmptyInputValue = (value: any): boolean => {
     return isUndefinedOrNull(value) || Number.isNaN(value) || value.length === 0;
 }
 
 export const isUndefinedOrNull = (value: any): boolean => {
     return value === null || value === undefined;
+}
+
+export const isValidatorFunction = (obj: any): boolean => {
+  return Array.isArray(obj) &&
+    obj.length === 2 &&
+    typeof obj[0] === 'string' &&
+    typeof obj[1] === 'function';
 }
 
 export const toObject = <T>(controls: [k: keyof T, v: RxFormControl<T>][]) =>
@@ -73,15 +59,15 @@ export const parseControls = <T>(controls): ControlMap<T, keyof T> => {
     ) as unknown as ControlMap<T, keyof T>;
 }
 
-export const isProxiable = (v) => {
+export const isProxiable = (v: any) => {
     return v !== null && typeof v !== 'function' && typeof v !== 'symbol' && typeof v === 'object';
 }
 
 /***
  * === NON PERFORMANT - USE WITH CAUTION ===
  */
-export const lazyDeepCopy = (obj) => {
-    const get = (target, property, receiver) => {
+export const lazyDeepCopy = (obj: any) => {
+    const get = (target: any, property: string | symbol, receiver: any) => {
         if (!(property in target)) {
             return undefined;
         }
@@ -101,7 +87,7 @@ export const lazyDeepCopy = (obj) => {
         return toProxy(obj);
     }
 
-    function toProxy(obj) {
+    function toProxy(obj: any) {
         return new Proxy(obj, { get });
     }
 

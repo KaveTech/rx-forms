@@ -12,7 +12,7 @@ import {toArray, toObject} from "./utils"
 
 const createControl = <T = any>(value: T, validators?: ValidatorFn | ValidatorFn[]): RxFormControl<T> => {
     const calculateStatus = (obj: RxFormControl<T>) => {
-        if (obj.errors) {
+        if (obj.errors.length) {
             return FormStatus.INVALID;
         }
 
