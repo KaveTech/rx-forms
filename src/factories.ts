@@ -95,6 +95,6 @@ export const FormFactory = {
         return createGroup(controls, validators, toObject);
     },
     array<T = any>(controls: FormArray<T>): RxControlGroup<T[]> {
-        return createGroup<T[], FormArray<T>>(controls, null, toArray);
+        return createGroup<T[], FormArray<T>>(controls, [], toArray);
     }
 }
