@@ -78,6 +78,9 @@ const withStatus: Mixin<WithStatus> = obj => {
  */
 
 const withValidation: (validators: ValidatorFn | ValidatorFn[]) => Mixin<WithValidation> = (validators = []) => obj => {
+  // Failsafe in case validators is null.
+  validators = validators || [];
+
   let _validators: ValidatorFn[] = isValidatorFunction(validators) ?
       [validators as ValidatorFn] as ValidatorFn[] :
       validators as ValidatorFn[];
