@@ -49,9 +49,9 @@ export const toObject = <T>(controls: [k: keyof T, v: RxFormControl<T>][]) =>
 export const toArray = <T>(controls: [k: keyof T, v: RxFormControl<T>][]) =>
     controls.reduce((res, [_ , v]) => [...res, v.value], []);
 
-export const parseControls = <T>(controls): ControlMap<T, keyof T> => {
+export const parseControls = <T>(controls, currentLength?: number): ControlMap<T, keyof T> => {
     if (Array.isArray(controls)) {
-        return new Map(controls.map((v, i) => [i, v])) as unknown as ControlMap<T, keyof T>;
+        return new Map(controls.map((v, i) => [i + currentLength, v])) as unknown as ControlMap<T, keyof T>;
     }
 
     return new Map(
