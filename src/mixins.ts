@@ -26,10 +26,14 @@ import {isValidatorFunction, lazyDeepCopy, mixin, parseControls, pipe} from "./u
  */
 
 const withUUID: Mixin<WithUUID> = obj => {
+    const isWindow = typeof window !== 'undefined'
+    
     const getRandomValues = (arr: Uint8Array): Uint8Array => arr.fill(Math.random() * 256 | 0);
 
-    const crypto = window['crypto'] || window['msCrypto'] || {};
-    crypto.getRandomValues = crypto.getRandomValues || getRandomValues;
+    if(isWindow){
+        const crypto = window['crypto'] || window['msCrypto'] || {};
+        crypto.getRandomValues = crypto.getRandomValues || getRandomValues;
+    }
 
     // @ts-ignore
     const generateUUID = (): string => ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, (c: number) =>
