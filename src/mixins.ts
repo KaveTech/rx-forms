@@ -28,7 +28,9 @@ import {isValidatorFunction, lazyDeepCopy, mixin, parseControls, pipe} from "./u
 const withUUID: Mixin<WithUUID> = obj => {
     const getRandomValues = (arr: Uint8Array): Uint8Array => arr.fill(Math.random() * 256 | 0);
 
-    const crypto = window['crypto'] || window['msCrypto'] || {};
+    const crypto = typeof window !== 'undefined' ?
+        window['crypto'] || window['msCrypto'] || {} : {};
+
     crypto.getRandomValues = crypto.getRandomValues || getRandomValues;
 
     // @ts-ignore
